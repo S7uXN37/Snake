@@ -1,2 +1,2 @@
 # Snake
-simple Snake gaem in Java 1.8
+simple Snake game in Java 1.8
