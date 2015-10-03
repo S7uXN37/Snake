@@ -1,4 +1,4 @@
-package net.crocodile_productions.main;
+package main;
 
 public class GameData {
 	String[] data;

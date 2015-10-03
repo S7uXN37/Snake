@@ -1,4 +1,4 @@
-package net.crocodile_productions.main;
+package main;
 
 public class Util {
 	public static int randomIntInRange(int lowerBound, int upperBound) {

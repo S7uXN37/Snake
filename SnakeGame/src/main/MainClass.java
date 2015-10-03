@@ -1,4 +1,4 @@
-package net.crocodile_productions.main;
+package main;
 
 import java.awt.*;
 import java.awt.event.*;

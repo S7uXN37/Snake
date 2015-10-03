@@ -1,4 +1,4 @@
-package net.crocodile_productions.main;
+package main;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;

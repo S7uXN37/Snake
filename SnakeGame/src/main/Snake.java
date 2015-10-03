@@ -1,4 +1,5 @@
-package net.crocodile_productions.main;
+package main;
+
 
 public class Snake {
 	public static final int UP = 0;

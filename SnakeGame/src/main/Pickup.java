@@ -1,4 +1,5 @@
-package net.crocodile_productions.main;
+package main;
+
 
 public class Pickup {
 	public static final int SIZE_UP = 0;
