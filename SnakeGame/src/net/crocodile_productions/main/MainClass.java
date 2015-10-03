@@ -49,7 +49,6 @@ public class MainClass extends JFrame {
 		title.setFont(TITLE_FONT);
 		
 		playButton.addActionListener(new ActionListener() {	
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(e.getActionCommand().equals("Play")) {
 					startGame();
@@ -63,12 +62,10 @@ public class MainClass extends JFrame {
 			l.setPreferredSize(COMPONENT_SIZE);
 			left.add(l);
 		}
-		for(JComponent c : fields) {
+		for(final JComponent c : fields) {
 			if(c instanceof JTextField) {
 				c.addFocusListener(new FocusListener() {
-					@Override
 					public void focusLost(FocusEvent e) {}
-					@Override
 					public void focusGained(FocusEvent e) {
 						((JTextField) c).setText("");
 					}
@@ -91,19 +88,12 @@ public class MainClass extends JFrame {
 		this.setLocationRelativeTo(null);
 		
 		this.addWindowListener(new WindowListener() {
-			@Override
 			public void windowActivated(WindowEvent e) {}
-			@Override
 			public void windowClosed(WindowEvent e) {}
-			@Override
 			public void windowDeactivated(WindowEvent e) {}
-			@Override
 			public void windowDeiconified(WindowEvent e) {}
-			@Override
 			public void windowIconified(WindowEvent e) {}
-			@Override
 			public void windowOpened(WindowEvent e) {}
-			@Override
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}

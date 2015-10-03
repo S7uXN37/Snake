@@ -13,21 +13,16 @@ public class InputInterface implements KeyListener {
 		game = g;
 	}
 	
-	@Override
 	public void setInput(Input input) {}
-
-	@Override
+	
 	public boolean isAcceptingInput() {
 		return true;
 	}
-
-	@Override
+	
 	public void inputEnded() {}
-
-	@Override
+	
 	public void inputStarted() {}
-
-	@Override
+	
 	public void keyPressed(int key, char c) {
 		switch(key) {
 			case Input.KEY_LEFT:
@@ -53,7 +48,6 @@ public class InputInterface implements KeyListener {
 				break;
 		}
 	}
-
-	@Override
+	
 	public void keyReleased(int key, char c) {}
 }

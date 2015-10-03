@@ -41,7 +41,6 @@ public class StatsDisplay extends JFrame {
 		this.setLocation((width+Game.WIDTH)/2+10, (height-Game.HEIGHT)/2-5);
 		
 		updateThread = new Thread(new Runnable(){
-			@Override
 			public void run() {
 				try {
 					do {
@@ -62,24 +61,17 @@ public class StatsDisplay extends JFrame {
 		this.setVisible(true);
 	}
 
-	public void reset(Game game) {
+	public void reset(final Game game) {
 		lastReset = System.currentTimeMillis();
 		updateStopped = false;
 		
 		this.addWindowListener(new WindowListener() {
-			@Override
 			public void windowActivated(WindowEvent e) {}
-			@Override
 			public void windowClosed(WindowEvent e) {}
-			@Override
 			public void windowDeactivated(WindowEvent e) {}
-			@Override
 			public void windowDeiconified(WindowEvent e) {}
-			@Override
 			public void windowIconified(WindowEvent e) {}
-			@Override
 			public void windowOpened(WindowEvent e) {}
-			@Override
 			public void windowClosing(WindowEvent e) {
 				killThread = true;
 				StatsDisplay sd = new StatsDisplay();
