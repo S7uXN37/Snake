@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.8.0_60"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Snake_Slick2D">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/Slick2D/lib/jinput.jar"/>
+	<classpathentry kind="lib" path="lib/Slick2D/lib/lwjgl_util.jar"/>
+	<classpathentry kind="lib" path="lib/Slick2D/lib/lwjgl.jar"/>
+	<classpathentry kind="lib" path="lib/Slick2D/lib/slick.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SnakeGame/lib"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/SnakeGame/lib/Slick2D/javadoc.zip!/javadoc"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SnakeGame/lib/Slick2D"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
