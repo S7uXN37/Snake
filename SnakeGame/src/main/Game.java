@@ -1,6 +1,14 @@
 package main;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -124,7 +132,7 @@ public class Game extends BasicGame
 		}
 		
 		if(closeRequested) {
-			// Save game data here TODO
+			saveHighscores();
 			Log.info("Close has been requested, exiting...");
 			gc.exit();
 		}
@@ -266,5 +274,82 @@ public class Game extends BasicGame
 			}
 		}
 		return false;
+	}
+	
+	int MAX_HIGHSCORE_SIZE = 10;
+	File highscoreFile = new File("highscores.dat");
+	TreeMap<String, Integer> highscores;
+	public void addHighscore(String key, int value) {
+		loadHighscores();
+		try {
+			highscores.put(key + "#" + value, new Integer(value));
+		} catch (IllegalArgumentException e) {
+			
+		}
+	}
+	
+	public void saveHighscores() {
+		loadHighscores();
+		try {
+			FileOutputStream fos = new FileOutputStream(highscoreFile);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			
+			oos.writeObject(highscores);
+			oos.flush();
+			
+			oos.close();
+			fos.close();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadHighscores() {
+		if(highscores == null) {
+			try {
+				if(highscoreFile.exists()) {
+					FileInputStream fis = new FileInputStream(highscoreFile);
+					ObjectInputStream ois = new ObjectInputStream(fis);
+					
+					Object read = ois.readObject();
+					
+					ois.close();
+					fis.close();
+					
+					if(read instanceof TreeMap) {
+						highscores = (TreeMap<String, Integer>)read;
+					} else {
+						throw new ClassCastException("Highscores file invalid");
+					}
+				} else {
+					highscores = new TreeMap<String, Integer>(new Comparator<String>() {
+						@Override
+						public int compare(String o1, String o2) {
+							int i1 = Integer.parseInt(o1.substring(o1.indexOf('#')+1));
+							int i2 = Integer.parseInt(o2.substring(o2.indexOf('#')+1));
+							
+							if(i1<i2) {
+								return -1;
+							} else if(i1>i2) {
+								return 1;
+							} else {
+								return 0;
+							}
+						}
+					});
+				}
+			} catch(IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if(highscores.size()>MAX_HIGHSCORE_SIZE) {
+			highscores.remove(highscores.descendingMap().lastKey());
+		}
+	}
+	
+	public void showHighscores() {
+		loadHighscores();
+		
 	}
 }
