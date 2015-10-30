@@ -46,7 +46,7 @@ public class StatsDisplay extends JFrame {
 					do {
 						if(!updateStopped){
 							time = System.currentTimeMillis()-lastReset;
-							redraw();
+							update();
 						}
 						Thread.sleep(100);
 					} while(!killThread);
@@ -80,13 +80,13 @@ public class StatsDisplay extends JFrame {
 				sd.time = time;
 				sd.lastReset = lastReset;
 				sd.updateStopped = updateStopped;
-				sd.redraw();
+				sd.update();
 				game.scoreWindow = sd;
 			}
 		});
 	}
 
-	protected void redraw() {
+	protected void update() {
 		scoreDisplay.setText(SCORE_PREFIX+score);
 		timeDisplay.setText(TIME_PREFIX+Util.millisToTime(time));
 	}

@@ -144,5 +144,7 @@ public class Snake {
 				}
 			}
 		}
+		
+		game.addHighscore(game.name, score);
 	}
 }

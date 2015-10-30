@@ -1,5 +1,7 @@
 package main;
 
+import java.awt.Font;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,6 +20,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.util.Log;
 
 public class Game extends BasicGame
@@ -27,6 +30,10 @@ public class Game extends BasicGame
 	public static int GRID_SIZE_Y = 30;
 	public static int PX_PER_GRID = 20;
 	public static int BORDER_SIZE = 10;
+	public static int HIGHSCORE_Y_OFFSET = 50;
+	public static TrueTypeFont HIGHSCORE_FONT;
+	public static final int HIGHSCORE_X_OFFSET = 100;
+	public static final int HIGHSCORE_Y_INCREMENT = 15;
 	public static final Color ENV_COLOR = Color.white;
 	public static final Color GRID_COLOR = new Color(1F, 1F, 1F, 0.5F);
 	public static final Color SNAKE_COLOR = Color.blue;
@@ -35,6 +42,7 @@ public class Game extends BasicGame
 	public static final Color PICKUP_SIZEUP_COLOR = Color.green;
 	public static final Color PICKUP_SCOREUP_COLOR = Color.orange;
 	public static final Color GAMEOVER_COLOR = Color.black;
+	public static final Color TEXT_COLOR = Color.white;
 	
 	public static boolean GROW_MODE = false;
 	public static boolean SPAWN_PICKUP_ONLY_ON_CONSUME = false;
@@ -62,6 +70,8 @@ public class Game extends BasicGame
 	public void init(GameContainer gc) throws SlickException {
 		gameContainer = gc;
 		gameContainer.setAlwaysRender(true);
+		Font awtFont = new Font("Times New Roman", Font.PLAIN, 20);
+		HIGHSCORE_FONT = new TrueTypeFont(awtFont, true);
 		reset();
 	}
 	
@@ -89,7 +99,7 @@ public class Game extends BasicGame
 	@Override
 	public void update(GameContainer gc, int i) throws SlickException {
 		scoreWindow.score = snake.score;
-		scoreWindow.redraw();
+		scoreWindow.update();
 		
 		long moveDelta = System.currentTimeMillis() - lastUpdateTime;
 		long pickupDelta = System.currentTimeMillis() - lastPickupTime;
@@ -217,6 +227,7 @@ public class Game extends BasicGame
 					break;
 				case 3://borderSize
 					BORDER_SIZE = Integer.parseInt(s);
+					HIGHSCORE_Y_OFFSET += BORDER_SIZE;
 					break;
 				case 4://growMode
 					GROW_MODE = Integer.parseInt(s)==1;
@@ -284,14 +295,14 @@ public class Game extends BasicGame
 		try {
 			highscores.put(key + "#" + value, new Integer(value));
 		} catch (IllegalArgumentException e) {
-			
+			// same player - same score
 		}
 	}
 	
 	public void saveHighscores() {
 		loadHighscores();
 		try {
-			FileOutputStream fos = new FileOutputStream(highscoreFile);
+			FileOutputStream fos = new FileOutputStream(highscoreFile, false);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			
 			oos.writeObject(highscores);
@@ -311,7 +322,16 @@ public class Game extends BasicGame
 					FileInputStream fis = new FileInputStream(highscoreFile);
 					ObjectInputStream ois = new ObjectInputStream(fis);
 					
-					Object read = ois.readObject();
+					Object read;
+					try {
+						read = ois.readObject();
+					} catch (EOFException e) {
+						ois.close();
+						fis.close();
+						highscoreFile.delete();
+						loadHighscores();
+						return;
+					}
 					
 					ois.close();
 					fis.close();
@@ -343,6 +363,10 @@ public class Game extends BasicGame
 			}
 		}
 		
+		shortenHighscores();
+	}
+	
+	private void shortenHighscores() {
 		if(highscores.size()>MAX_HIGHSCORE_SIZE) {
 			highscores.remove(highscores.descendingMap().lastKey());
 		}
@@ -350,6 +374,15 @@ public class Game extends BasicGame
 	
 	public void showHighscores() {
 		loadHighscores();
-		
+		String[] keys = (String[]) highscores.descendingKeySet().toArray();
+		for(int i=0; i<keys.length ; i++) {
+			String key = keys[i];
+			String text = key.substring(0, key.indexOf('#'));
+			DrawEvent render = new TextDrawEvent(TEXT_COLOR, -1L, 0L, text, HIGHSCORE_FONT,
+					HIGHSCORE_X_OFFSET,
+					HIGHSCORE_Y_OFFSET + i*HIGHSCORE_Y_INCREMENT
+				);
+			drawQueue.add(render);
+		}
 	}
 }
