@@ -13,17 +13,17 @@ public abstract class DrawEvent {
 	protected long deathMillis;
 	
 	/**
-	 * @param field field to draw on
 	 * @param color color to draw with
 	 * @param lifeTime time to draw for (-1 = forever)
+	 * @param delay time to draw after
 	 */
-	public DrawEvent(Color color, long lifeTime, long delay) {
+	public DrawEvent(Color color, float lifeTime, float delay) {
 		this.color = color;
 		this.lifeTime = lifeTime;
 		this.delay = delay;
 		birth = System.currentTimeMillis();
-		startMillis = birth+delay;
-		deathMillis = startMillis+lifeTime;
+		startMillis = birth+(long)delay;
+		deathMillis = startMillis+(long)lifeTime;
 	}
 	
 	public boolean hasExpired() {

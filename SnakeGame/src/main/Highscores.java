@@ -7,22 +7,19 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.newdawn.slick.TrueTypeFont;
-import org.newdawn.slick.util.Log;
-
 public class Highscores {
 	
-	public static final int HIGHSCORE_X_OFFSET = 100;
-	public static final int HIGHSCORE_Y_INCREMENT = 15;
+	public static final int HIGHSCORE_Y_INCREMENT = 20;
+	private static final int HIGHSCORE_DISPLAY_LENGTH = 40;
+	public static final int MAX_NAME_LENGTH = 25;
+	public static int HIGHSCORE_X_OFFSET = 50;
 	public static int HIGHSCORE_Y_OFFSET = 50;
-	public static TrueTypeFont HIGHSCORE_FONT;
-	public static int MAX_HIGHSCORE_SIZE = 10;
+	public static int MAX_HIGHSCORE_COUNT = 15;
 	
 	private static File highscoreFile = new File("highscores.dat");
 	private static String highscores;
 	
 	public static void add(String name, int score) {
-		Log.info("Adding score: name=" + name + " score=" + score);
 		load();
 		
 		String[] scores = highscores.split("\\|");
@@ -47,15 +44,13 @@ public class Highscores {
 					break;
 				}
 			}
-		} else {
-			Log.info("entry not added, already found; entry: " + entry);
 		}
 		
-		Log.info("updated highscores: " + highscores);
+		shorten();
+		save();
 	}
 	
 	public static void save() {
-		Log.info("Writing scores: " + highscores);
 		load();
 		try {
 			FileOutputStream fos = new FileOutputStream(highscoreFile, false);
@@ -72,7 +67,6 @@ public class Highscores {
 	}
 	
 	public static void load() {
-		Log.info("Loading highscores");
 		if(highscores == null) {
 			try {
 				if(highscoreFile.exists()) {
@@ -106,26 +100,39 @@ public class Highscores {
 			}
 		}
 		
-		shortenHighscores();
+		shorten();
 	}
 	
-	private static void shortenHighscores() {
-		if(highscores.length()>MAX_HIGHSCORE_SIZE) {
-			String[] scores = highscores.split("\\|");
-			Util.joinInclusive(scores, 0, scores.length-2, "|");
+	private static void shorten() {
+		String[] scores = highscores.split("\\|");
+		if(scores.length > MAX_HIGHSCORE_COUNT) {
+			String[] newScores = new String[MAX_HIGHSCORE_COUNT];
+			for(int i=0; i<newScores.length; i++) {
+				newScores[i] = scores[i];
+			}
+			highscores = Util.joinInclusive(newScores, 0, newScores.length-1, "|");
 		}
 	}
 	
-	public static DrawEvent[] getDrawEvents() {
+	public static TextDrawEvent[] getDrawEvents() {
 		load();
 		
 		String[] keys = highscores.split("\\|");
-		DrawEvent[] draws = new DrawEvent[keys.length];
+		TextDrawEvent[] draws = new TextDrawEvent[keys.length];
 		
 		for(int i=0; i<keys.length ; i++) {
 			String key = keys[i];
-			String text = key.replaceAll("#", "\t");
-			DrawEvent render = new TextDrawEvent(Game.TEXT_COLOR, -1L, 0L, text, HIGHSCORE_FONT,
+			
+			String text = key.split("#")[0];
+			String score = key.split("#")[1];
+			
+			while(text.length() + score.length() < HIGHSCORE_DISPLAY_LENGTH ) {
+				text += " ";
+			}
+			
+			text += score;
+			
+			TextDrawEvent render = new TextDrawEvent(Game.TEXT_COLOR, -1L, 0L, text, Game.HIGHSCORE_FONT,
 					HIGHSCORE_X_OFFSET,
 					HIGHSCORE_Y_OFFSET + i*HIGHSCORE_Y_INCREMENT
 				);

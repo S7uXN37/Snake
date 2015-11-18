@@ -115,7 +115,6 @@ public class Snake {
 	public void kill(DrawEvent drawEvent) {
 		this.isAlive = false;
 		game.addDrawEvent(drawEvent);
-		game.scoreWindow.stopTimer();
 		
 		float del = (float) (5F/Math.pow((float)Game.GRID_SIZE_Y, 2));
 		float delPassed = 0F;

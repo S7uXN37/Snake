@@ -20,19 +20,19 @@ public class MainClass extends JFrame {
 	
 	private JTextField name = new JTextField(10);
 	private JLabel nameLabel = new JLabel("Nickname:");
-	private JTextField gameSize = new JTextField("20x20", 10);
+	private JTextField gameSize = new JTextField(Game.GRID_SIZE_X + "x" + Game.GRID_SIZE_Y, 10);
 	private JLabel gameSizeLabel = new JLabel("Game size (<40x40):");
-	private JTextField pxPerField = new JTextField("20", 4);
+	private JTextField pxPerField = new JTextField(""+Game.PX_PER_FIELD, 4);
 	private JLabel pxPerFieldLabel = new JLabel("Px per field:");
-	private JTextField borderSize = new JTextField("10", 4);
+	private JTextField borderSize = new JTextField(""+Game.BORDER_SIZE, 4);
 	private JLabel borderSizeLabel = new JLabel("Border size:");
 	private JCheckBox growMode = new JCheckBox();
 	private JLabel growModeLabel = new JLabel("Grow automatically:");
 	private JCheckBox spawnOnConsume = new JCheckBox();
 	private JLabel spawnOnConsumeLabel = new JLabel("Only one pickup:");
-	private JTextField growRate = new JTextField("0.5", 4);
+	private JTextField growRate = new JTextField(""+Game.GROW_RATE, 4);
 	private JLabel growRateLabel = new JLabel("Grow rate (per move):");
-	private JTextField spawnRate = new JTextField("0.2", 4);
+	private JTextField spawnRate = new JTextField(""+Game.PICKUP_SPAWN_RATE, 4);
 	private JLabel spawnRateLabel = new JLabel("Spawn rate (per move):");
 	private JButton playButton = new JButton("Play");
 	
@@ -106,7 +106,11 @@ public class MainClass extends JFrame {
 		for(int i=0 ; i<fields.length ; i++) {
 			JComponent f = fields[i];
 			if(f instanceof JTextField) {
-				settings[i] = ((JTextField)f).getText();
+				String fieldText = ((JTextField)f).getText().replaceAll("\\|", "").replaceAll("#", "");
+				if(fieldText.length()>Highscores.MAX_NAME_LENGTH) {
+					fieldText = fieldText.substring(0, Highscores.MAX_NAME_LENGTH);
+				}
+				settings[i] = fieldText;
 			} else if (f instanceof JCheckBox) {
 				if(((JCheckBox)f).isSelected()) {
 					settings[i] = "1";

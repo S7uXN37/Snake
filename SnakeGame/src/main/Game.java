@@ -17,10 +17,12 @@ import org.newdawn.slick.util.Log;
 public class Game extends BasicGame
 {
 	public static String NAME = "TheNamelessHero";
-	public static int GRID_SIZE_X = 30;
-	public static int GRID_SIZE_Y = 30;
-	public static int PX_PER_GRID = 20;
-	public static int BORDER_SIZE = 10;
+	public static int GRID_SIZE_X = 20;
+	public static int GRID_SIZE_Y = 20;
+	public static int PX_PER_FIELD = 20;
+	public static int BORDER_SIZE = 15;
+	public static float GROW_RATE = 0.5F;
+	public static float PICKUP_SPAWN_RATE = 0.2F;
 	
 	public static final Color ENV_COLOR = Color.white;
 	public static final Color GRID_COLOR = new Color(1F, 1F, 1F, 0.5F);
@@ -34,12 +36,9 @@ public class Game extends BasicGame
 	
 	public static boolean GROW_MODE = false;
 	public static boolean SPAWN_PICKUP_ONLY_ON_CONSUME = false;
-	
-	private static float GROW_RATE = 0.5F;
-	private static float PICKUP_RATE = 0.2F;
+	public static TrueTypeFont HIGHSCORE_FONT;
 	
 	public GameContainer gameContainer;
-	public StatsDisplay scoreWindow;
 	
 	private Snake snake;
 	private ArrayList<DrawEvent> drawQueue = new ArrayList<DrawEvent>();
@@ -51,15 +50,16 @@ public class Game extends BasicGame
 	public Game(String gamename)
 	{
 		super(gamename);
-		scoreWindow = new StatsDisplay();
 	}
 
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 		gameContainer = gc;
 		gameContainer.setAlwaysRender(true);
-		Font awtFont = new Font("Times New Roman", Font.PLAIN, 20);
-		Highscores.HIGHSCORE_FONT = new TrueTypeFont(awtFont, true);
+		
+		Font awtFont = new Font("Consolas", Font.PLAIN, 15);
+		HIGHSCORE_FONT = new TrueTypeFont(awtFont, true);
+		
 		reset();
 	}
 	
@@ -73,9 +73,7 @@ public class Game extends BasicGame
 		drawQueue.clear();
 		pickups.clear();
 		closeRequested = false;
-		
-		scoreWindow.reset(this);
-		
+				
 		gameContainer.getInput().removeAllKeyListeners();
 		gameContainer.getInput().addKeyListener(new InputInterface(snake, this));
 	}
@@ -85,10 +83,7 @@ public class Game extends BasicGame
 	long lastPickupTime = System.currentTimeMillis();
 	
 	@Override
-	public void update(GameContainer gc, int i) throws SlickException {
-		scoreWindow.score = snake.score;
-		scoreWindow.update();
-		
+	public void update(GameContainer gc, int i) throws SlickException {		
 		long moveDelta = System.currentTimeMillis() - lastUpdateTime;
 		long pickupDelta = System.currentTimeMillis() - lastPickupTime;
 		long growDelta = System.currentTimeMillis() - lastGrowTime;
@@ -119,7 +114,7 @@ public class Game extends BasicGame
 				}
 			}
 		} else {
-			if( pickupDelta > 1000 / PICKUP_RATE ){
+			if( pickupDelta > 1000 / PICKUP_SPAWN_RATE ){
 				if(GROW_MODE) {
 					pickups.add(Pickup.newPickup(this, new int[]{Pickup.SCORE_UP}));
 				} else {
@@ -151,17 +146,17 @@ public class Game extends BasicGame
 		// draw grid
 		g.setColor(GRID_COLOR);
 		for(int i=1 ; i<GRID_SIZE_X ; i++) { // vertical lines
-			g.drawLine(i*PX_PER_GRID + BORDER_SIZE,
+			g.drawLine(i*PX_PER_FIELD + BORDER_SIZE,
 				BORDER_SIZE,
-				i*PX_PER_GRID + BORDER_SIZE,
+				i*PX_PER_FIELD + BORDER_SIZE,
 				HEIGHT - BORDER_SIZE
 			);
 		}
 		for(int i=1 ; i<GRID_SIZE_Y ; i++) { // horizontal lines
 			g.drawLine(BORDER_SIZE,
-				i*PX_PER_GRID + BORDER_SIZE,
+				i*PX_PER_FIELD + BORDER_SIZE,
 				WIDTH - BORDER_SIZE,
-				i*PX_PER_GRID + BORDER_SIZE
+				i*PX_PER_FIELD + BORDER_SIZE
 			);
 		}
 		
@@ -185,15 +180,20 @@ public class Game extends BasicGame
 				d.draw(gc, g);
 			}
 		}
+		
+		// draw score
+		String scoreText = "SCORE: "+snake.score;
+		DrawEvent score_de = new TextDrawEvent(Color.black, 0L, 0L, scoreText, HIGHSCORE_FONT, (WIDTH-scoreText.length()*8)/2, 0);
+		score_de.draw(gc, g);
 	}
 
 	public static void fillField(GameContainer gc, Graphics g, int field) {
 		int[] c = Util.fieldToCoords(field);
 		g.fillRect(
-			PX_PER_GRID * c[0] + BORDER_SIZE,
-			PX_PER_GRID * c[1] + BORDER_SIZE,
-			PX_PER_GRID,
-			PX_PER_GRID
+			PX_PER_FIELD * c[0] + BORDER_SIZE,
+			PX_PER_FIELD * c[1] + BORDER_SIZE,
+			PX_PER_FIELD,
+			PX_PER_FIELD
 		);
 	}
 
@@ -211,11 +211,12 @@ public class Game extends BasicGame
 					GRID_SIZE_Y = Integer.parseInt(dims[1]);
 					break;
 				case 2://pxPerField
-					PX_PER_GRID = Integer.parseInt(s);
+					PX_PER_FIELD = Integer.parseInt(s);
 					break;
 				case 3://borderSize
 					BORDER_SIZE = Integer.parseInt(s);
 					Highscores.HIGHSCORE_Y_OFFSET += BORDER_SIZE;
+					Highscores.HIGHSCORE_X_OFFSET += BORDER_SIZE;
 					break;
 				case 4://growMode
 					GROW_MODE = Integer.parseInt(s)==1;
@@ -227,15 +228,15 @@ public class Game extends BasicGame
 					GROW_RATE = Float.parseFloat(s);
 					break;
 				case 7://spawnRate
-					PICKUP_RATE = Float.parseFloat(s);
+					PICKUP_SPAWN_RATE = Float.parseFloat(s);
 					break;
 			}
 		}
 		
 		try
 		{
-			WIDTH = PX_PER_GRID * GRID_SIZE_X + BORDER_SIZE*2;
-			HEIGHT = PX_PER_GRID * GRID_SIZE_Y + BORDER_SIZE*2;
+			WIDTH = PX_PER_FIELD * GRID_SIZE_X + BORDER_SIZE*2;
+			HEIGHT = PX_PER_FIELD * GRID_SIZE_Y + BORDER_SIZE*2;
 			AppGameContainer appgc;
 			appgc = new AppGameContainer(new Game("Snake Game"));
 			appgc.setDisplayMode(WIDTH, HEIGHT, false);

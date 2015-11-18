@@ -10,7 +10,7 @@ public class TextDrawEvent extends DrawEvent {
 	Font font;
 	int x,y;
 	
-	public TextDrawEvent(Color color, long lifeTime, long delay, String text, Font font, int x, int y) {
+	public TextDrawEvent(Color color, float lifeTime, float delay, String text, Font font, int x, int y) {
 		super(color, lifeTime, delay);
 		this.text = text;
 		this.font = font;
