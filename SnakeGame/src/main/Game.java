@@ -25,7 +25,7 @@ import org.newdawn.slick.util.Log;
 
 public class Game extends BasicGame
 {
-	public static String name = "TheNamelessHero";
+	public static String NAME = "TheNamelessHero";
 	public static int GRID_SIZE_X = 30;
 	public static int GRID_SIZE_Y = 30;
 	public static int PX_PER_GRID = 20;
@@ -215,7 +215,7 @@ public class Game extends BasicGame
 			String s = settings[i];
 			switch(i) {
 				case 0://name
-					name = s;
+					NAME = s;
 					break;
 				case 1://gameSize
 					String[] dims = s.split("x");
@@ -289,11 +289,12 @@ public class Game extends BasicGame
 	
 	int MAX_HIGHSCORE_SIZE = 10;
 	File highscoreFile = new File("highscores.dat");
-	TreeMap<String, Integer> highscores;
+	String highscores;
 	public void addHighscore(String key, int value) {
 		loadHighscores();
 		try {
-			highscores.put(key + "#" + value, new Integer(value));
+			highscores += "|" + key.replaceAll(" ", "") + "#" + value;
+			Log.info("new highscores: " + highscores);
 		} catch (IllegalArgumentException e) {
 			// same player - same score
 		}
@@ -325,7 +326,7 @@ public class Game extends BasicGame
 					Object read;
 					try {
 						read = ois.readObject();
-					} catch (EOFException e) {
+					} catch (IOException e) {
 						ois.close();
 						fis.close();
 						highscoreFile.delete();
@@ -336,27 +337,13 @@ public class Game extends BasicGame
 					ois.close();
 					fis.close();
 					
-					if(read instanceof TreeMap) {
-						highscores = (TreeMap<String, Integer>)read;
+					if(read instanceof String) {
+						highscores = (String)read;
 					} else {
-						throw new ClassCastException("Highscores file invalid");
+						throw new ClassCastException("Highscores file corrupted");
 					}
 				} else {
-					highscores = new TreeMap<String, Integer>(new Comparator<String>() {
-						@Override
-						public int compare(String o1, String o2) {
-							int i1 = Integer.parseInt(o1.substring(o1.indexOf('#')+1));
-							int i2 = Integer.parseInt(o2.substring(o2.indexOf('#')+1));
-							
-							if(i1<i2) {
-								return -1;
-							} else if(i1>i2) {
-								return 1;
-							} else {
-								return 0;
-							}
-						}
-					});
+					highscores = "";
 				}
 			} catch(IOException | ClassNotFoundException e) {
 				e.printStackTrace();
@@ -367,14 +354,14 @@ public class Game extends BasicGame
 	}
 	
 	private void shortenHighscores() {
-		if(highscores.size()>MAX_HIGHSCORE_SIZE) {
-			highscores.remove(highscores.descendingMap().lastKey());
+		if(highscores.length()>MAX_HIGHSCORE_SIZE) {
+			// TODO remove smallest score
 		}
 	}
 	
 	public void showHighscores() {
 		loadHighscores();
-		String[] keys = (String[]) highscores.descendingKeySet().toArray();
+		String[] keys = highscores.split("|");
 		for(int i=0; i<keys.length ; i++) {
 			String key = keys[i];
 			String text = key.substring(0, key.indexOf('#'));

@@ -145,6 +145,6 @@ public class Snake {
 			}
 		}
 		
-		game.addHighscore(game.name, score);
+		game.addHighscore(Game.NAME, score);
 	}
 }
