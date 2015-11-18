@@ -145,6 +145,11 @@ public class Snake {
 			}
 		}
 		
-		game.addHighscore(Game.NAME, score);
+		Highscores.add(Game.NAME, score);
+		
+		DrawEvent[] scores = Highscores.getDrawEvents();
+		for(DrawEvent de : scores) {
+			game.addDrawEvent(de);
+		}
 	}
 }

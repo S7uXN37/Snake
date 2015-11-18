@@ -37,4 +37,21 @@ public class Util {
 		int y = field/Game.GRID_SIZE_X;
 		return new int[]{x,y};
 	}
+
+	public static <T> int indexInArray(T[] split, T entry) {
+		for(int i=0; i<split.length; i++) {
+			if(split[i].equals(entry)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public static String joinInclusive(String[] arr, int beginIndex, int endIndex, String separator) {
+		String joint = "";
+		for(int m=beginIndex; m<=endIndex; m++) {
+			joint += arr[m] + separator;
+		}
+		return joint.substring(0, joint.length()-separator.length()); // remove excess separator
+	}
 }

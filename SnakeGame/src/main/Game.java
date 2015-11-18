@@ -1,16 +1,7 @@
 package main;
 
 import java.awt.Font;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,10 +21,7 @@ public class Game extends BasicGame
 	public static int GRID_SIZE_Y = 30;
 	public static int PX_PER_GRID = 20;
 	public static int BORDER_SIZE = 10;
-	public static int HIGHSCORE_Y_OFFSET = 50;
-	public static TrueTypeFont HIGHSCORE_FONT;
-	public static final int HIGHSCORE_X_OFFSET = 100;
-	public static final int HIGHSCORE_Y_INCREMENT = 15;
+	
 	public static final Color ENV_COLOR = Color.white;
 	public static final Color GRID_COLOR = new Color(1F, 1F, 1F, 0.5F);
 	public static final Color SNAKE_COLOR = Color.blue;
@@ -71,7 +59,7 @@ public class Game extends BasicGame
 		gameContainer = gc;
 		gameContainer.setAlwaysRender(true);
 		Font awtFont = new Font("Times New Roman", Font.PLAIN, 20);
-		HIGHSCORE_FONT = new TrueTypeFont(awtFont, true);
+		Highscores.HIGHSCORE_FONT = new TrueTypeFont(awtFont, true);
 		reset();
 	}
 	
@@ -142,7 +130,7 @@ public class Game extends BasicGame
 		}
 		
 		if(closeRequested) {
-			saveHighscores();
+			Highscores.save();
 			Log.info("Close has been requested, exiting...");
 			gc.exit();
 		}
@@ -227,7 +215,7 @@ public class Game extends BasicGame
 					break;
 				case 3://borderSize
 					BORDER_SIZE = Integer.parseInt(s);
-					HIGHSCORE_Y_OFFSET += BORDER_SIZE;
+					Highscores.HIGHSCORE_Y_OFFSET += BORDER_SIZE;
 					break;
 				case 4://growMode
 					GROW_MODE = Integer.parseInt(s)==1;
@@ -286,90 +274,5 @@ public class Game extends BasicGame
 		}
 		return false;
 	}
-	
-	int MAX_HIGHSCORE_SIZE = 10;
-	File highscoreFile = new File("highscores.dat");
-	String highscores;
-	public void addHighscore(String key, int value) {
-		loadHighscores();
-		try {
-			highscores += "|" + key.replaceAll(" ", "") + "#" + value;
-			Log.info("new highscores: " + highscores);
-		} catch (IllegalArgumentException e) {
-			// same player - same score
-		}
-	}
-	
-	public void saveHighscores() {
-		loadHighscores();
-		try {
-			FileOutputStream fos = new FileOutputStream(highscoreFile, false);
-			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			
-			oos.writeObject(highscores);
-			oos.flush();
-			
-			oos.close();
-			fos.close();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void loadHighscores() {
-		if(highscores == null) {
-			try {
-				if(highscoreFile.exists()) {
-					FileInputStream fis = new FileInputStream(highscoreFile);
-					ObjectInputStream ois = new ObjectInputStream(fis);
-					
-					Object read;
-					try {
-						read = ois.readObject();
-					} catch (IOException e) {
-						ois.close();
-						fis.close();
-						highscoreFile.delete();
-						loadHighscores();
-						return;
-					}
-					
-					ois.close();
-					fis.close();
-					
-					if(read instanceof String) {
-						highscores = (String)read;
-					} else {
-						throw new ClassCastException("Highscores file corrupted");
-					}
-				} else {
-					highscores = "";
-				}
-			} catch(IOException | ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		shortenHighscores();
-	}
-	
-	private void shortenHighscores() {
-		if(highscores.length()>MAX_HIGHSCORE_SIZE) {
-			// TODO remove smallest score
-		}
-	}
-	
-	public void showHighscores() {
-		loadHighscores();
-		String[] keys = highscores.split("|");
-		for(int i=0; i<keys.length ; i++) {
-			String key = keys[i];
-			String text = key.substring(0, key.indexOf('#'));
-			DrawEvent render = new TextDrawEvent(TEXT_COLOR, -1L, 0L, text, HIGHSCORE_FONT,
-					HIGHSCORE_X_OFFSET,
-					HIGHSCORE_Y_OFFSET + i*HIGHSCORE_Y_INCREMENT
-				);
-			drawQueue.add(render);
-		}
-	}
+
 }
