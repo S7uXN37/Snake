@@ -46,6 +46,10 @@ public class InputInterface implements KeyListener {
 			case Input.KEY_K:
 				snake.kill(new FieldDrawEvent(0, Color.white, 0, 0));
 				break;
+			case Input.KEY_DELETE:
+				if(!snake.isAlive) { // in highscore screen
+					Highscores.reset();
+				}
 		}
 	}
 	

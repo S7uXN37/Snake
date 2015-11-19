@@ -46,12 +46,20 @@ public class Game extends BasicGame
 	private boolean closeRequested = false;
 	protected static int WIDTH;
 	protected static int HEIGHT;
+	private static Game instance;
 	
-	public Game(String gamename)
+	protected Game(String gamename)
 	{
 		super(gamename);
 	}
-
+	
+	public static Game getInstance() {
+		if(instance==null) {
+			instance = new Game("Snake Game");
+		}
+		return instance;
+	}
+	
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 		gameContainer = gc;
@@ -238,7 +246,7 @@ public class Game extends BasicGame
 			WIDTH = PX_PER_FIELD * GRID_SIZE_X + BORDER_SIZE*2;
 			HEIGHT = PX_PER_FIELD * GRID_SIZE_Y + BORDER_SIZE*2;
 			AppGameContainer appgc;
-			appgc = new AppGameContainer(new Game("Snake Game"));
+			appgc = new AppGameContainer(getInstance());
 			appgc.setDisplayMode(WIDTH, HEIGHT, false);
 			appgc.setShowFPS(false);
 			appgc.start();

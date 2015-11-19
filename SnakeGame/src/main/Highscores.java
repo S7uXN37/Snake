@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.newdawn.slick.Color;
+
 public class Highscores {
 	
 	public static final int HIGHSCORE_Y_INCREMENT = 20;
@@ -53,6 +55,9 @@ public class Highscores {
 	public static void save() {
 		load();
 		try {
+			if(!highscoreFile.exists()) {
+				highscoreFile.createNewFile();
+			}
 			FileOutputStream fos = new FileOutputStream(highscoreFile, false);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			
@@ -80,7 +85,7 @@ public class Highscores {
 						ois.close();
 						fis.close();
 						highscoreFile.delete();
-						load();
+						highscores = "";
 						return;
 					}
 					
@@ -112,6 +117,16 @@ public class Highscores {
 			}
 			highscores = Util.joinInclusive(newScores, 0, newScores.length-1, "|");
 		}
+	}
+	
+	public static void reset() {
+		highscoreFile.delete();
+		highscores = "";
+		DrawEvent noti = new TextDrawEvent(Color.red, 0F, 0F, "Highscores deleted", Game.HIGHSCORE_FONT,
+				HIGHSCORE_X_OFFSET,
+				HIGHSCORE_Y_OFFSET + MAX_HIGHSCORE_COUNT*HIGHSCORE_Y_INCREMENT
+			);
+		Game.getInstance().addDrawEvent(noti); // TODO debug, doesn't show up
 	}
 	
 	public static TextDrawEvent[] getDrawEvents() {
