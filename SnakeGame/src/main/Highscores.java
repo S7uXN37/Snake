@@ -122,11 +122,11 @@ public class Highscores {
 	public static void reset() {
 		highscoreFile.delete();
 		highscores = "";
-		DrawEvent noti = new TextDrawEvent(Color.red, 0F, 0F, "Highscores deleted", Game.HIGHSCORE_FONT,
+		DrawEvent noti = new TextDrawEvent(Color.red, -1F, 0F, "Highscores deleted", Game.HIGHSCORE_FONT,
 				HIGHSCORE_X_OFFSET,
 				HIGHSCORE_Y_OFFSET + MAX_HIGHSCORE_COUNT*HIGHSCORE_Y_INCREMENT
 			);
-		Game.getInstance().addDrawEvent(noti); // TODO debug, doesn't show up
+		Game.getInstance().addDrawEvent(noti);
 	}
 	
 	public static TextDrawEvent[] getDrawEvents() {
@@ -147,7 +147,7 @@ public class Highscores {
 			
 			text += score;
 			
-			TextDrawEvent render = new TextDrawEvent(Game.TEXT_COLOR, -1L, 0L, text, Game.HIGHSCORE_FONT,
+			TextDrawEvent render = new TextDrawEvent(Game.TEXT_COLOR, -1F, 0F, text, Game.HIGHSCORE_FONT,
 					HIGHSCORE_X_OFFSET,
 					HIGHSCORE_Y_OFFSET + i*HIGHSCORE_Y_INCREMENT
 				);
@@ -158,6 +158,10 @@ public class Highscores {
 	}
 	
 	private static int getScore(String entry) {
-		return Integer.parseInt(entry.split("#")[1]);
+		try {
+			return Integer.parseInt(entry.split("#")[1]);
+		} catch(ArrayIndexOutOfBoundsException e) {
+			return 0;
+		}
 	}
 }

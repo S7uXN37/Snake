@@ -76,14 +76,14 @@ public class Game extends BasicGame
 		int startY = (GRID_SIZE_Y-1)/2;
 		int startPos = Util.coordsToField(startX, startY);
 		
-		snake = new Snake(startPos, this);
+		snake = new Snake(startPos);
 		
 		drawQueue.clear();
 		pickups.clear();
 		closeRequested = false;
 				
 		gameContainer.getInput().removeAllKeyListeners();
-		gameContainer.getInput().addKeyListener(new InputInterface(snake, this));
+		gameContainer.getInput().addKeyListener(new InputInterface(snake));
 	}
 
 	long lastUpdateTime = System.currentTimeMillis();
@@ -96,39 +96,40 @@ public class Game extends BasicGame
 		long pickupDelta = System.currentTimeMillis() - lastPickupTime;
 		long growDelta = System.currentTimeMillis() - lastGrowTime;
 		
-		if( moveDelta > 1000 / snake.getSpeed()){
-			boolean grow = false;
-			if(GROW_MODE) {
-				grow = growDelta > 1000/GROW_RATE;
-			} else if (snake.growQueued){
-				grow = true;
-				snake.growQueued = false;
-			}
-			// Snake
-			if(snake.isAlive) {
+		if(snake.isAlive) {
+			if( moveDelta > 1000 / snake.getSpeed()){
+				boolean grow = false;
+				if(GROW_MODE) {
+					grow = growDelta > 1000/GROW_RATE;
+				} else if (snake.growQueued){
+					grow = true;
+					snake.growQueued = false;
+				}
+				// Snake
 				snake.move(grow);
 				if(grow) {
 					lastGrowTime = System.currentTimeMillis();
 				}
+				
+				lastUpdateTime=System.currentTimeMillis();
 			}
-			lastUpdateTime=System.currentTimeMillis();
-		}
-		if(SPAWN_PICKUP_ONLY_ON_CONSUME) {
-			if(pickups.size()==0) {
-				if(GROW_MODE){
-					pickups.add(Pickup.newPickup(this, new int[]{Pickup.SCORE_UP}));
-				} else {
-					pickups.add(Pickup.newPickup(this, Pickup.TYPES));
+			if(SPAWN_PICKUP_ONLY_ON_CONSUME) {
+				if(pickups.size()==0) {
+					if(GROW_MODE){
+						pickups.add(Pickup.newPickup(new int[]{Pickup.SCORE_UP}));
+					} else {
+						pickups.add(Pickup.newPickup(Pickup.TYPES));
+					}
 				}
-			}
-		} else {
-			if( pickupDelta > 1000 / PICKUP_SPAWN_RATE ){
-				if(GROW_MODE) {
-					pickups.add(Pickup.newPickup(this, new int[]{Pickup.SCORE_UP}));
-				} else {
-					pickups.add(Pickup.newPickup(this, Pickup.TYPES));
+			} else {
+				if( pickupDelta > 1000 / PICKUP_SPAWN_RATE ){
+					if(GROW_MODE) {
+						pickups.add(Pickup.newPickup(new int[]{Pickup.SCORE_UP}));
+					} else {
+						pickups.add(Pickup.newPickup(Pickup.TYPES));
+					}
+					lastPickupTime = System.currentTimeMillis();
 				}
-				lastPickupTime = System.currentTimeMillis();
 			}
 		}
 		

@@ -35,14 +35,16 @@ public class Pickup {
 		}
 	}
 
-	public static Pickup newPickup(Game game, int[] selection) {
+	public static Pickup newPickup(int[] selection) {
 		int type = selection[Util.randomIntInRange(0, selection.length-1)];
 		int field;
+		
 		do {
 			int x = Util.randomIntInRange(0, Game.GRID_SIZE_X-1);
 			int y = Util.randomIntInRange(0, Game.GRID_SIZE_Y-1);
 			field = Util.coordsToField(x, y);
-		} while (game.isOccupied(field));
+		} while (Game.getInstance().isOccupied(field));
+		
 		return new Pickup(type, field);
 	}
 }

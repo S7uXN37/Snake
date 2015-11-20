@@ -6,11 +6,9 @@ import org.newdawn.slick.KeyListener;
 
 public class InputInterface implements KeyListener {
 	private Snake snake;
-	private Game game;
 	
-	public InputInterface(Snake s, Game g) {
+	public InputInterface(Snake s) {
 		snake = s;
-		game = g;
 	}
 	
 	public void setInput(Input input) {}
@@ -38,10 +36,10 @@ public class InputInterface implements KeyListener {
 				snake.setDirection(Snake.DOWN);
 				break;
 			case Input.KEY_ESCAPE:
-				game.close();
+				Game.getInstance().close();
 				break;
 			case Input.KEY_R:
-				game.reset();
+				Game.getInstance().reset();
 				break;
 			case Input.KEY_K:
 				snake.kill(new FieldDrawEvent(0, Color.white, 0, 0));

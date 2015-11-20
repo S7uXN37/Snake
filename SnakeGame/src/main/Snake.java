@@ -12,14 +12,12 @@ public class Snake {
 	
 	public boolean isAlive = true;
 	public int[] occupiedFields;
-	protected Game game;
 	private int direction = RIGHT;
 	public boolean growQueued = false;
 	public int score = 0;
 	
-	public Snake(int startField, Game parentInstance) {
+	public Snake(int startField) {
 		occupiedFields = new int[]{startField};
-		game = parentInstance;
 	}
 	
 	public void setDirection(int newDir) {
@@ -85,7 +83,7 @@ public class Snake {
 			newHead = oldHead;
 		}
 		// if the head-field is already occupied, kill the snake
-		if(game.isOccupied(newHead) && this.isAlive) {
+		if(Game.getInstance().isOccupied(newHead) && this.isAlive) {
 			kill(
 					new FieldDrawEvent(
 						newHead,
@@ -97,7 +95,7 @@ public class Snake {
 		}
 		
 		// check for pickup
-		if(this.isAlive) game.tryPickup(newHead);
+		if(this.isAlive) Game.getInstance().tryPickup(newHead);
 		
 		// update occupied fields
 		occupiedFields = workingCopy;
@@ -114,7 +112,7 @@ public class Snake {
 
 	public void kill(DrawEvent drawEvent) {
 		this.isAlive = false;
-		game.addDrawEvent(drawEvent);
+		Game.getInstance().addDrawEvent(drawEvent);
 		
 		float del = (float) (5F/Math.pow((float)Game.GRID_SIZE_Y, 2));
 		float delPassed = 0F;
@@ -127,7 +125,7 @@ public class Snake {
 						del,
 						delPassed + y*del
 					);
-					game.addDrawEvent(d);
+					Game.getInstance().addDrawEvent(d);
 				}
 			}
 			delPassed += (Game.GRID_SIZE_Y-n)*del;
@@ -139,7 +137,7 @@ public class Snake {
 						-1,
 						delPassed
 					);
-					game.addDrawEvent(d);
+					Game.getInstance().addDrawEvent(d);
 				}
 			}
 		}
@@ -148,7 +146,7 @@ public class Snake {
 		
 		DrawEvent[] scores = Highscores.getDrawEvents();
 		for(DrawEvent de : scores) {
-			game.addDrawEvent(de);
+			Game.getInstance().addDrawEvent(de);
 		}
 	}
 }
